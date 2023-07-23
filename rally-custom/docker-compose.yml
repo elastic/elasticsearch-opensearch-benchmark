@@ -1,0 +1,13 @@
+version: '3'
+services:
+  test: 
+    image: ugosan/rally-custom:2.8.0-dev
+    command: > 
+      race --track-path=/rally/custom_tracks/big5
+      --target-hosts=34.28.235.192:9200 
+      --pipeline=benchmark-only 
+      --client-options="use_ssl:true,verify_certs:false,basic_auth_user:'elastic',basic_auth_password:'r3ty2yT21QVC2HM4H555NXt4'"  
+      --challenge='test'
+      --exclude-tasks=delete-index,index-append,type:index,type:create-index,type:raw-request
+    environment:
+      - PYTHONUNBUFFERED=1

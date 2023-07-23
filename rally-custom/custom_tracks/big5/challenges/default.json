@@ -1,0 +1,14 @@
+{
+  "name": "big5",
+  "default": true,
+  "schedule": [
+    {{ rally.collect(parts="common/big5-schedule.json") }}
+  ]
+},
+{
+  "name": "test",
+  "default": false,
+  "schedule": [
+    {{ rally.collect(parts="common/test-schedule.json") }}
+  ]
+}

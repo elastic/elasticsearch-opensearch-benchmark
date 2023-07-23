@@ -1,0 +1,225 @@
+{
+  "operation": "default",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 20
+},
+{
+  "name": "term",
+  "operation": "term",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 50
+},
+{
+  "operation": "multi_terms-keyword",
+  "warmup-iterations": 50,
+  "iterations": 50,
+  "target-throughput": 0.3
+},
+{
+  "operation": "range",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 25
+},
+{
+  "operation": "range-numeric",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 25
+},
+{
+  "operation": "keyword-in-range",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 20
+},
+{
+  "operation": "date_histogram_hourly_agg",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 20
+},
+{
+  "operation": "date_histogram_minute_agg",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 10
+},
+{
+  "operation": "desc_sort_timestamp",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 20
+},
+{
+  "operation": "asc_sort_timestamp",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 20
+},
+{
+  "operation": "desc_sort_with_after_timestamp",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 10
+},
+{
+  "operation": "asc_sort_with_after_timestamp",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 10
+},
+{
+  "operation": "desc_sort_timestamp_can_match_shortcut",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 20
+},
+{
+  "operation": "desc_sort_timestamp_no_can_match_shortcut",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 20
+},
+{
+  "operation": "asc_sort_timestamp_can_match_shortcut",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 20
+},
+{
+  "operation": "asc_sort_timestamp_no_can_match_shortcut",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 20
+},
+{
+  "operation": "scroll",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "#COMMENT": "Throughput is considered per request. So we issue one scroll request per second which will retrieve 25 pages",
+  "target-throughput": 1
+},
+{
+  "operation": "query-string-on-message",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 20
+},
+{
+  "operation": "query-string-on-message-filtered",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 20
+},
+{
+  "operation": "query-string-on-message-filtered-sorted-num",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 20
+},
+{
+  "operation": "sort_keyword_can_match_shortcut",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 20
+},
+{
+  "operation": "sort_keyword_no_can_match_shortcut",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 20
+},
+{
+  "operation": "sort_numeric_desc",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 20
+},
+{
+  "operation": "sort_numeric_asc",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 20
+},
+{
+  "operation": "sort_numeric_desc_with_match",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 20
+},
+{
+  "operation": "sort_numeric_asc_with_match",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 20
+},
+{
+  "operation": "range_field_conjunction_big_range_big_term_query",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 20
+},
+{
+  "operation": "range_field_disjunction_big_range_small_term_query",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 20
+},
+{
+  "operation": "range_field_conjunction_small_range_small_term_query",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 20
+},
+{
+  "operation": "range_field_conjunction_small_range_big_term_query",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 20
+},
+{
+  "operation": "range-auto-date-histo",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 20
+},
+{
+  "operation": "range-auto-date-histo-with-metrics",
+  "warmup-iterations": 100,
+  "iterations": 100,
+  "target-throughput": 20
+},
+{
+  "operation": "composite-terms",
+  "warmup-iterations": 50,
+  "iterations": 50,
+  "target-throughput": 0.3
+},
+{
+  "operation": "composite_terms-keyword",
+  "warmup-iterations": 50,
+  "iterations": 50,
+  "target-throughput": 0.3
+},
+{
+  "operation": "composite-date_histogram-daily",
+  "warmup-iterations": 50,
+  "iterations": 50,
+  "target-throughput": 0.3
+},
+{
+  "operation": "keyword-terms",
+  "warmup-iterations": 50,
+  "iterations": 50,
+  "target-throughput": 0.3
+},
+{
+  "operation": "keyword-terms-low-cardinality",
+  "warmup-iterations": 50,
+  "iterations": 50,
+  "target-throughput": 0.3
+}
+

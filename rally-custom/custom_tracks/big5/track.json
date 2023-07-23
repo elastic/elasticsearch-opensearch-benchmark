@@ -1,0 +1,12 @@
+{% set index_body = 'index.json' %}
+
+{
+  "version": 2,
+  "description": "Random HTTP server log data",
+  "operations": [
+    {{ rally.collect(parts="operations/*.json") }}
+  ],
+  "challenges": [
+    {{ rally.collect(parts="challenges/*.json") }}
+  ]
+}
