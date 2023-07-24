@@ -1,0 +1,36 @@
+- name: "@timestamp"
+  fuzinness: 0.7
+  range: 
+    min: 1672531200 #Sunday, January 1, 2023 12:00:00 AM
+    max: 1672617599 #Sunday, January 1, 2023 11:59:59 PM
+- name: process.name
+  enum: ["journal", "kernel", "systemd", "cron", "sshd", "httpd", "udev"]
+- name: metrics.tmin
+  fuzziness: 0.1
+  range:
+    min: 1
+    max: 2000
+- name: metrics.size
+  fuzziness: 0.1
+  range:
+    min: 1000
+    max: 10000
+- name: agent.id
+  enum: ["619a4ca8-9cae-4548-a9ea-1b1c8cfda29c","c79a289f-6c16-4de2-a6c8-8ee5c84473d5","5f25fa16-6a99-489f-b1c5-f27c0627a459","c315dc22-3ea6-44dc-8d56-fd02f675367b","98a5f50f-4ae2-4bc7-9bfd-3e26e7ac6da7","9d0fd4b2-0cf1-4b9b-9ad1-61e46657134d","628cdfc8-a97a-4050-8f4f-bf53f2bf983c","3dbba8f5-1576-4381-8c8c-24c988d20681","baac7358-a449-4c36-bf0f-befb211f1d38","954bc54b-9454-4971-8c6e-b0968eeeaaed"]
+- name: cloud.region
+  enum: ["us-east-1", "us-east-2", "us-west-1", "us-west-2", "ap-south-1", "ap-northeast-3", "ap-northeast-2", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ca-central-1", "eu-central-1", "eu-west-1", "eu-west-2", "eu-west-3", "eu-north-1", "sa-east-1", "af-south-1", "ap-east-1", "ap-south-2", "ap-southeast-3", "eu-south-2", "eu-central-2", "me-south-1", "me-central-1"]
+  cardinality:
+    numerator: 1
+    denominator: 100
+- name: aws.cloudwatch.log_stream
+  cardinality:
+    numerator: 1
+    denominator: 100
+- name: host.name
+  cardinality:
+    numerator: 1
+    denominator: 100
+- name: aws.ec2.ip_address
+  cardinality:
+    numerator: 1
+    denominator: 100
