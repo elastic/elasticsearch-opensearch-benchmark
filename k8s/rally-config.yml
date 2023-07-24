@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rally-config
+data:
+  rally.ini: |
+    [meta]
+    config.version = 17
+
+    [system]
+    env.name = local
+
+    [node]
+    root.dir = /rally/.rally/benchmarks
+    src.root.dir = /rally/.rally/benchmarks/src
+
+    [source]
+    remote.repo.url = https://github.com/elastic/elasticsearch.git
+    elasticsearch.src.subdir = elasticsearch
+
+    [benchmarks]
+    local.dataset.cache = /rally-tracks-cache
+
+    [reporting]
+    datastore.type = elasticsearch
+    datastore.host = your.elasticsearch-host.cloud.es.io
+    datastore.port = 9243
+    datastore.secure = True
+    datastore.user = elastic
+    datastore.password = your-elastic-password
+
+    [tracks]
+    default.url = https://github.com/elastic/rally-tracks
+
+    [teams]
+    default.url = https://github.com/elastic/rally-teams
+
+    [defaults]
+    preserve_benchmark_candidate = false
+
+    [distributions]
+    release.cache = true
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rally-tracks-data-es
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 70Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rally-tracks-data-os
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 70Gi

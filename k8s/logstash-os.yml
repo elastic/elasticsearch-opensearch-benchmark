@@ -1,0 +1,115 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: logstash-os-day1
+spec:
+  nodeSelector:
+    cloud.google.com/gke-nodepool: rally-nodes
+  containers:
+  - name: logstash
+    image: ugosan/logstash-custom:8.8.2-dev
+    imagePullPolicy: Always
+    resources:
+        limits:
+          memory: "2Gi"
+          cpu: "2500m"
+        requests: 
+          memory: "1Gi"
+          cpu: "300m"
+    env: 
+      - name: GCP_FILE_MATCH_REGEX
+        value: "2023-01-01/.*\\.gz"
+      - name: USERNAME
+        valueFrom:
+          secretKeyRef:
+            name: os-cluster-admin-password
+            key: username
+      - name: PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: os-cluster-admin-password
+            key: password
+    volumeMounts:
+        - name: config-volume
+          mountPath: /usr/share/logstash/config
+        - name: tmp-volume
+          mountPath: /tmp/logstash/
+        - name: pipeline-volume
+          mountPath: /tmp/logstash/pipelines
+        - name: credentials
+          mountPath: /tmp/logstash/credentials
+  volumes:  
+  - name: tmp-volume
+    emptyDir: {}
+  - name: config-volume
+    configMap:
+      name: logstash-configmap-os
+      items:
+        - key: pipelines.yml
+          path: pipelines.yml
+        - key: logstash.yml
+          path: logstash.yml
+  - name: credentials
+    secret:
+      secretName: google-cloud-storage-credentials
+      items:
+      - key: encoded
+        path: credentials.json
+  - name: pipeline-volume
+    configMap:
+      name: logstash-configmap-os
+      items:
+        - key: big5-benchmark.conf
+          path: big5-benchmark.conf
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash-configmap-os
+data:
+  pipelines.yml: |
+    - pipeline.id: big5-benchmarks
+      path.config: "/tmp/logstash/pipelines/big5-benchmark.conf"
+      pipeline.batch.size: 3000
+  logstash.yml: |
+    log.level: info
+  big5-benchmark.conf: |
+    input {
+        google_cloud_storage {
+            bucket_id => "my-benchmarks-datasets"
+            file_matches => "${GCP_FILE_MATCH_REGEX}"
+            processed_db_path => "/tmp/logstash/processed_db"
+            codec => json_lines
+            json_key_file => "/tmp/logstash/credentials/credentials.json"
+            interval => 300
+            metadata_key => "x-goog-meta-benchmarks-22-july"
+        }
+    }
+
+    filter {
+
+        mutate {
+            remove_field => ["path", "@version", "host", "data_stream"]
+            copy => {
+              "[@metadata][gcs][name]" => "[meta][file]"
+            }
+        }
+
+    }
+
+    output {
+
+        opensearch {
+            hosts => ["https://os-cluster.default.svc.cluster.local:9200"]
+            ssl => true
+            ssl_certificate_verification => false
+            document_id => "%{[@metadata][gcs][line_id]}"
+            index => "logs-benchmark-dev"
+            action => "create"
+            user => "${USERNAME}"
+            password => "${PASSWORD}"
+        }
+        
+    }
