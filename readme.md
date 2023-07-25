@@ -3,7 +3,7 @@
 
 ## 1 - Provisioning the infrastructure
 
-<kbd><img src="screenshots/diagram.drawio.png" width="640"></kbd>
+<kbd><img src="screenshots/diagram.drawio.png"></kbd>
 
 
 Use [this terraform script](./terraform/main.tf) to provision a Kubernetes cluster with:
