@@ -3,6 +3,9 @@ from scipy.stats import ttest_ind
 def performance_diff(title, ylabel, xlabel, ax, operations, box_colors, data, value_column='value.90_0'):
   """
   Calculate and visualize performance difference between two products (Elasticsearch and OpenSearch).
+  We perform a t-test to compare the 90th percentile latency of Elasticsearch (es) and OpenSearch (va) 
+  for the specified operations. We then calculate the percentage difference in performance between 
+  the two products and plot the mean performance values of each product as a bar chart.
 
   Parameters:
       title (str): Title for the plot.
@@ -15,14 +18,6 @@ def performance_diff(title, ylabel, xlabel, ax, operations, box_colors, data, va
       value_column (str, optional): The column in the DataFrame containing the performance values.
                                     Default is 'value.90_0'.
 
-  Returns:
-      None: This function does not return anything. It prints the results and plots the bar chart.
-
-  Note:
-      The function performs a t-test to compare the 90th percentile latency of Elasticsearch (es) and
-      OpenSearch (va) for the specified operations. It then calculates the percentage difference in
-      performance between the two products and plots the mean performance values of each product as
-      a bar chart.
   """  
 
   data = data[data['operation'].isin(operations)]
