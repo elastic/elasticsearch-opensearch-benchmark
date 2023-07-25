@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
+import re
 import warnings
 from typing import Any, Iterable, Mapping, Optional
 
@@ -62,7 +63,6 @@ class _ProductChecker:
 
     @classmethod
     def raise_error(cls, state, meta, body):
-
         # These states mean the product_check() didn't fail so do nothing.
         if state in (None, True):
             return
@@ -76,69 +76,22 @@ class _ProductChecker:
     @classmethod
     def check_product(cls, headers, response):
         # type: (dict[str, str], dict[str, str]) -> int
+        """This class was supposed to verify that the server we're talking to is Elasticsearch.
+        It actually returns
         """
-        Verifies that the server we're talking to is Elasticsearch.
-        Does this by checking HTTP headers and the deserialized
-        response to the 'info' API. Returns one of the states above.
-        """
-
-        version = response.get("version", {})
-        try:
-            version_number = versions.Version.from_string(version.get("number", None))
-        except TypeError:
-            # No valid 'version.number' field, either Serverless Elasticsearch, or not Elasticsearch at all
-            version_number = versions.Version.from_string("0.0.0")
-
-        build_flavor = version.get("build_flavor", None)
-
-        # Check all of the fields and headers for missing/valid values.
-        try:
-            bad_tagline = response.get("tagline", None) != "You Know, for Search"
-            bad_build_flavor = build_flavor not in ("default", "serverless")
-            bad_product_header = headers.get("x-elastic-product", None) != "Elasticsearch"
-        except (AttributeError, TypeError):
-            bad_tagline = True
-            bad_build_flavor = True
-            bad_product_header = True
-
-        # 7.0-7.13 and there's a bad 'tagline' or unsupported 'build_flavor'
-        if versions.Version.from_string("7.0.0") <= version_number < versions.Version.from_string("7.14.0"):
-            if bad_tagline:
-                return cls.UNSUPPORTED_PRODUCT
-            elif bad_build_flavor:
-                return cls.UNSUPPORTED_DISTRIBUTION
-
-        elif (
-            # No version or version less than 6.8.0, and we're not talking to a serverless elasticsearch
-            (version_number < versions.Version.from_string("6.8.0") and not versions.is_serverless(build_flavor))
-            # 6.8.0 and there's a bad 'tagline'
-            or (versions.Version.from_string("6.8.0") <= version_number < versions.Version.from_string("7.0.0") and bad_tagline)
-            # 7.14+ and there's a bad 'X-Elastic-Product' HTTP header
-            or (versions.Version.from_string("7.14.0") <= version_number and bad_product_header)
-        ):
-            return cls.UNSUPPORTED_PRODUCT
-
         return True
-
+        
 
 class RallySyncElasticsearch(Elasticsearch):
     def __init__(self, *args, **kwargs):
         distribution_version = kwargs.pop("distribution_version", None)
-        distribution_flavor = kwargs.pop("distribution_flavor", None)
         super().__init__(*args, **kwargs)
         self._verified_elasticsearch = None
-        self.distribution_version = distribution_version
-        self.distribution_flavor = distribution_flavor
 
-    @property
-    def is_serverless(self):
-        return versions.is_serverless(self.distribution_flavor)
-
-    def options(self, *args, **kwargs):
-        new_self = super().options(*args, **kwargs)
-        new_self.distribution_version = self.distribution_version
-        new_self.distribution_flavor = self.distribution_flavor
-        return new_self
+        if distribution_version:
+            self.distribution_version = versions.Version.from_string(distribution_version)
+        else:
+            self.distribution_version = None
 
     def perform_request(
         self,
@@ -176,19 +129,14 @@ class RallySyncElasticsearch(Elasticsearch):
             self._verified_elasticsearch = _ProductChecker.check_product(info_meta.headers, info_body)
 
             if self._verified_elasticsearch is not True:
-                # BYPASS PRODUCT CHECK, raising no errors if not talking to Elasticsearch
-                pass
-                #_ProductChecker.raise_error(self._verified_elasticsearch, info_meta, info_body)
+                _ProductChecker.raise_error(self._verified_elasticsearch, info_meta, info_body)
 
         # Converts all parts of a Accept/Content-Type headers
         # from application/X -> application/vnd.elasticsearch+X
         # see https://github.com/elastic/elasticsearch/issues/51816
-        if not self.is_serverless:
-            if versions.is_version_identifier(self.distribution_version) and (
-                versions.Version.from_string(self.distribution_version) >= versions.Version.from_string("8.0.0")
-            ):
-                _mimetype_header_to_compat("Accept", headers)
-                _mimetype_header_to_compat("Content-Type", headers)
+        if self.distribution_version is not None and self.distribution_version >= versions.Version.from_string("8.0.0"):
+            _mimetype_header_to_compat("Accept", request_headers)
+            _mimetype_header_to_compat("Content-Type", request_headers)
 
         if params:
             target = f"{path}?{_quote_query(params)}"
