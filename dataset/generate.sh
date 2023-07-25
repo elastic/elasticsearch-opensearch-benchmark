@@ -31,5 +31,4 @@ do
       rm "${file/-template.tpl/.ndjson}.gz"
     done
 
-
 done
