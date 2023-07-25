@@ -1,6 +1,5 @@
 from scipy.stats import ttest_ind
 
-
 def performance_diff(title, ylabel, xlabel, ax, operations, box_colors, data, value_column='value.90_0'):
   
   data = data[data['operation'].isin(operations)]
@@ -15,12 +14,8 @@ def performance_diff(title, ylabel, xlabel, ax, operations, box_colors, data, va
 
   performance_difference_pct = 100 * (abs(va_mean - es_mean)/ ((es_mean+va_mean)/2)) 
 
-
   print(f"===== {title} - {performance_difference_pct:.1f}% ")
   print(f"===== (90th percentile latency of {es_mean:.0f}ms vs. {va_mean:.0f}ms, p<0.01) p={ttest.pvalue:.5f} | Samples: {len(data.index)*100} requests")
-  #column = 'value.90_0'
-  #data.loc[:, column] = 1/data.loc[:, value_column] 
-  #data.loc[:, column] = ( data[column] - data[column].min() ) / (data[column].max() - data[column].min())
 
   grouped_data = data.groupby('user-tags.product')[value_column].mean().reset_index()
 
@@ -28,7 +23,6 @@ def performance_diff(title, ylabel, xlabel, ax, operations, box_colors, data, va
 
   ax.set_title(title)
   ax.set_ylabel(ylabel)
-  #ax.set_ylim([0,1])
   ax.tick_params(axis='both', labelsize=8)
 
 
