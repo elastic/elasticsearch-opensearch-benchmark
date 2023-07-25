@@ -561,11 +561,125 @@ PUT _data_stream/logs-benchmark-dev
 
 ## 2 - Generating the dataset
 
+[This script](./dataset/generate.sh) relies on the [elastic integration corpus generator tool](https://github.com/elastic/) to generate 1TB of data split into 1024 files of 1GB each and then upload the files to a Google Cloud Storage bucket.
+
+```bash
+# Full path to elastic-integration-corpus-generator-tool binary tool
+export GENERATOR=/full/path/to/elastic-integration-corpus-generator-tool-arm
+# Where the dataset should be written
+export CORPORA_ROOT=/full/path/to/dataset/generated
+export CONFIG=config-1.yml
+export BUCKET=gs://my-gcp-bucket/2023-01-01/
+```
+
+The binaries of the elastic integration corpus generator tool are also provided in the repository for ARM and Intel architectures, in the `dataset/bin` folder.
+
 
 ## 3 - Ingesting the dataset
 
+Now that our data is in a Google Cloud Storage bucket, we will use the `google-cloud-storage` input plugin for Logstash, and we are also going to need the `logstash-output-opensearch` to send data to OpenSearch. Those two plugins dont come installed by default in Logstash, luckly this can be easily fixed with a custom Docker image, for which a [Dockerfile](./logstash-custom/Dockerfile) is provided.
 
-## 4 - Running the benchmark with Rally
+Let's build our custom Logstash image using the Makefile in `logstash-custom/Makefile`, the image is multi-arch so it will work on both ARM and Intel machines, you just need to change the `$TAG` variable to match your docker username, the makefile will use docker buildx to build the image and push to the repository.
+
+```makefile
+TAG := ugosan/logstash-custom:8.8.2-dev
+
+ARM_TAG := $(TAG)-manifest-arm64v8
+AMD_TAG := $(TAG)-manifest-amd64
+
+all: build push pull
+
+build:
+	@echo "\n::: Building $(ARM_TAG)"
+	docker buildx build --push -f Dockerfile --platform linux/arm64/v8 --tag $(ARM_TAG) .
+	@echo "\n::: Building $(AMD_TAG)"
+	docker buildx build --push -f Dockerfile --platform linux/amd64 --tag $(AMD_TAG) .
+	docker manifest create $(TAG) --amend $(ARM_TAG) --amend $(AMD_TAG)
+	@echo "\n::: Building done!"
+
+push:
+	docker manifest push $(TAG) --purge
+
+pull:
+	docker pull $(TAG)
+```
+
+Just run `make` in `logstash-custom` and you will be good to go.
+
+Now lets use Logstash to index the data from GCS to Elasticsearch and OpenSearch, for which two Kubernetes manifests are provided: `logstash-es.yml` and `logstash-os.yml`, but before you run them, make sure you included your `credentials.json` from GCP into `logstash-gcp-credentials.yml`.
+
+Get a base64 encoded version of your `credentials.json` and add it to `logstash-gcp-credentials.yml` then apply it:
+
+```
+kubectl apply -f logstash-gcp-credentials.yml
+```
+
+The Logstash Pods must be allocated to a separate nodepool from Elasticsearch and OpenSearch ones, for which we will be using the `rally-nodes` nodepool we have configured in terraform. We also specify the `image` we have just made and the `GCP_FILE_MATCH_REGEX` to fetch the `*.ndjson.gz` dataset files. 
+
+```yml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: logstash-es
+spec:
+  nodeSelector:
+    cloud.google.com/gke-nodepool: rally-nodes
+  containers:
+  - name: logstash
+    image: ugosan/logstash-custom:8.8.2-dev
+    imagePullPolicy: Always
+    env: 
+      - name: GCP_FILE_MATCH_REGEX
+        value: "2023-01-03/.*\\.gz"
+...
+```
+
+
+Run the Logstash instances and wait (probably a lot) until all the data is indexed:
+
+```
+kubectl apply -f logstash-es.yml logstash-os.yml
+```
+
+Note you can run multiple logstash instances with different `GCP_FILE_MATCH_REGEX` to speed up the process, don't worry about data being ingested twice because the document id's are unique and both Elasticsearch and OpenSearch will reject "upserts" to the data. The Google Cloud Storage plugin also writes a metadata field to every file it has already ingested (set it in `metadata_key`), also make sure to adjust the `pipeline.batch.size`. All those configurations can be done in the `ConfigMap` at the bottom of `logstash-es.yml` and `logstash-os.yml`
+
+After a while you will have the dataset fully loaded, in our case we have ingested a little bit over 5.5 billion documents that would fall between 1st January 2023 and 7th January 2023, the Rally tracks are also considering the data to exist within this time range.
+
+<kbd><img src="screenshots/2023-07-25-12-04-28.png" width="640"></kbd>
+
+## 4 - Running the benchmarks with Rally
+
+Rally is an open-source tool developed by Elastic for benchmarking and performance testing of Elasticsearch only. However, since OpenSearch is a fork of Elasticsearch and we are not using anything exclusive to Elasticsearch like Runtime Fields (schema-on-read) in our searches, we can safely assume both solutions will work for our set of queries, we just need to bypass the code where the system verification is made.
+
+### Build our custom image
+
+Just like for Logstash, we also have a custom Dockerfile and a Makefile to build the docker image. In the Dockerfile we are just reusing the elastic/rally:2.8.0 image and injecting a modified client library into it (one that does not check if the counterpart is Elasticsearch). We also copy a custom track we are calling "big5" that will run a series of queries against the logs-benchmark-* datastreams.
+
+Change the `$TAG` to match your username and repository, then run `make` inside `rally-custom`
+
+```makefile
+TAG := ugosan/rally-custom:2.8.0-dev
+ARM_TAG := $(TAG)-manifest-arm64v8
+AMD_TAG := $(TAG)-manifest-amd64
+
+all: build push pull
+
+build:
+	@echo "\n::: Building $(ARM_TAG)"
+	docker buildx build --push -f Dockerfile --platform linux/arm64/v8 --tag $(ARM_TAG) .
+	@echo "\n::: Building $(AMD_TAG)"
+	docker buildx build --push -f Dockerfile --platform linux/amd64 --tag $(AMD_TAG) .
+	docker manifest create $(TAG) --amend $(ARM_TAG) --amend $(AMD_TAG)
+	@echo "\n::: Building done!"
+
+push:
+	docker manifest push $(TAG) --purge
+
+pull:
+	docker pull $(TAG)
+```
+
+The `rally-config.yml` contains the `rally.ini` configuration, in which you must change the [reporting] section so the results are shipped to an Elasticsearch cluster (different from the one we are using to actual run the benchmarks, obviously), elastic cloud has a 14 trial you can use.
 
 
 Apply the configmap first:

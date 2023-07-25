@@ -51,49 +51,49 @@
   "operation": "desc_sort_timestamp",
   "warmup-iterations": 100,
   "iterations": 100,
-  "target-throughput": 20
+  "target-throughput": 1
 },
 {
   "operation": "asc_sort_timestamp",
   "warmup-iterations": 100,
   "iterations": 100,
-  "target-throughput": 20
+  "target-throughput": 1
 },
 {
   "operation": "desc_sort_with_after_timestamp",
   "warmup-iterations": 100,
   "iterations": 100,
-  "target-throughput": 10
+  "target-throughput": 1
 },
 {
   "operation": "asc_sort_with_after_timestamp",
   "warmup-iterations": 100,
   "iterations": 100,
-  "target-throughput": 10
+  "target-throughput": 1
 },
 {
   "operation": "desc_sort_timestamp_can_match_shortcut",
   "warmup-iterations": 100,
   "iterations": 100,
-  "target-throughput": 20
+  "target-throughput": 1
 },
 {
   "operation": "desc_sort_timestamp_no_can_match_shortcut",
   "warmup-iterations": 100,
   "iterations": 100,
-  "target-throughput": 20
+  "target-throughput": 1
 },
 {
   "operation": "asc_sort_timestamp_can_match_shortcut",
   "warmup-iterations": 100,
   "iterations": 100,
-  "target-throughput": 20
+  "target-throughput": 1
 },
 {
   "operation": "asc_sort_timestamp_no_can_match_shortcut",
   "warmup-iterations": 100,
   "iterations": 100,
-  "target-throughput": 20
+  "target-throughput": 1
 },
 {
   "operation": "scroll",
@@ -184,13 +184,13 @@
   "operation": "range-auto-date-histo",
   "warmup-iterations": 100,
   "iterations": 100,
-  "target-throughput": 20
+  "target-throughput": 1
 },
 {
   "operation": "range-auto-date-histo-with-metrics",
   "warmup-iterations": 100,
   "iterations": 100,
-  "target-throughput": 20
+  "target-throughput": 1
 },
 {
   "operation": "composite-terms",
