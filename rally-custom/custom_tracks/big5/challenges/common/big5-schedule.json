@@ -9,25 +9,25 @@
   "operation": "term",
   "warmup-iterations": 100,
   "iterations": 100,
-  "target-throughput": 50
+  "target-throughput": 20
 },
 {
   "operation": "multi_terms-keyword",
   "warmup-iterations": 50,
   "iterations": 50,
-  "target-throughput": 0.3
+  "target-throughput": 0.1
 },
 {
   "operation": "range",
   "warmup-iterations": 100,
   "iterations": 100,
-  "target-throughput": 25
+  "target-throughput": 20
 },
 {
   "operation": "range-numeric",
   "warmup-iterations": 100,
   "iterations": 100,
-  "target-throughput": 25
+  "target-throughput": 20
 },
 {
   "operation": "keyword-in-range",
@@ -196,30 +196,30 @@
   "operation": "composite-terms",
   "warmup-iterations": 50,
   "iterations": 50,
-  "target-throughput": 0.3
+  "target-throughput": 0.1
 },
 {
   "operation": "composite_terms-keyword",
   "warmup-iterations": 50,
   "iterations": 50,
-  "target-throughput": 0.3
+  "target-throughput": 0.1
 },
 {
   "operation": "composite-date_histogram-daily",
   "warmup-iterations": 50,
   "iterations": 50,
-  "target-throughput": 0.3
+  "target-throughput": 0.1
 },
 {
   "operation": "keyword-terms",
   "warmup-iterations": 50,
   "iterations": 50,
-  "target-throughput": 0.3
+  "target-throughput": 0.1
 },
 {
   "operation": "keyword-terms-low-cardinality",
   "warmup-iterations": 50,
   "iterations": 50,
-  "target-throughput": 0.3
+  "target-throughput": 0.1
 }
 

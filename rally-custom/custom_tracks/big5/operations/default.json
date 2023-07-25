@@ -656,14 +656,6 @@
               "field": "metrics.size",
               "ranges": [
                 {
-                  "to": -10
-                },
-                {
-                  "from": -10,
-                  "to": 10
-                },
-                {
-                  "from": 10,
                   "to": 100
                 },
                 {
@@ -683,7 +675,7 @@
               "date": {
                 "auto_date_histogram": {
                   "field": "@timestamp",
-                  "buckets": 20
+                  "buckets": 10
                 },
                 "aggs": {
                   "tmin": {
@@ -713,13 +705,13 @@
       "operation-type": "search",
       "index": "logs-benchmark-*",
       "request-timeout": 7200,
-      "body": {
+      "body":{
         "size": 0,
         "query": {
           "range": {
             "@timestamp": {
-              "gte": "2022-12-30T00:00:00",
-              "lt": "2023-01-01T03:00:00"
+              "gte": "2023-01-05T00:00:00",
+              "lt": "2023-01-05T05:00:00"
             }
           }
         },
@@ -729,9 +721,6 @@
               "terms": [
                 {
                   "field": "process.name"
-                },
-                {
-                  "field": "event.id"
                 },
                 {
                   "field": "cloud.region"
@@ -752,7 +741,7 @@
           "range": {
             "@timestamp": {
               "gte": "2023-01-02T00:00:00",
-              "lt": "2023-01-03T00:00:00"
+              "lt": "2023-01-02T10:00:00"
             }
           }
         },
@@ -778,7 +767,7 @@
           "range": {
             "@timestamp": {
               "gte": "2023-01-02T00:00:00",
-              "lt": "2023-01-03T00:00:00"
+              "lt": "2023-01-02T10:00:00"
             }
           }
         },
@@ -846,7 +835,7 @@
           "country": {
             "terms": {
               "field": "aws.cloudwatch.log_stream",
-              "size": 100
+              "size": 50
             }
           }
         }
