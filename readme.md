@@ -72,7 +72,7 @@ Go to [this section](./datastreams/opensearch.md) and copy and paste to a Dashbo
 
 Your Kubernetes cluster should look something like below, with 6 nodes for Elasticsearch and 6 for OpenSearch.
 
-<kbd><img src="screenshots/2023-07-25-12-19-48.png" width="640"></kbd>
+<kbd><img src="screenshots/2023-07-25-12-19-48.png" ></kbd>
 
 We can use the _cat nodes API to quickly inspect we have both solutions under the same conditions, run the following in Dev Tools:
 
@@ -82,11 +82,11 @@ GET _cat/nodes?v&h=ip,name,cpu,ram.max,heap.max,heap.current,heap.percent,diskAv
 
 Elasticsearch should show `ram.max` as 64gb and `heap.max` as 31gb:
 
-<kbd><img src="screenshots/2023-07-25-12-24-41.png" width="640"></kbd>
+<kbd><img src="screenshots/2023-07-25-12-24-41.png" ></kbd>
 
 Similarly OpenSearch:
 
-<kbd><img src="screenshots/2023-07-25-12-25-39.png" width="640"></kbd>
+<kbd><img src="screenshots/2023-07-25-12-25-39.png" ></kbd>
 
 
 
