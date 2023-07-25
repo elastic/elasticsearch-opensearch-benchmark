@@ -3,10 +3,14 @@
 
 ## 1 - Provisioning the infrastructure
 
+<kbd><img src="screenshots/diagram.drawio.png" width="640"></kbd>
+
+
 Use [this terraform script](./terraform/main.tf) to provision a Kubernetes cluster with:
 - 1 Node pool for Elasticsearch with 6 `e2-standard-32` machines (128GB RAM and 32 CPUs)
 - 1 Node pool for OpenSearch with 6 `e2-standard-32` machines (128GB RAM and 32 CPUs)
 - 1 Node pool for Rally with 2 `t2a-standard-16` machines (64GB RAM and 16 CPUs)
+
 
 
 ## Creating Elasticsearch and Opensearch clusters
