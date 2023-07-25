@@ -9,13 +9,6 @@ spec:
   - name: logstash
     image: ugosan/logstash-custom:8.8.2-dev
     imagePullPolicy: Always
-    resources:
-        limits:
-          memory: "2Gi"
-          cpu: "2500m"
-        requests: 
-          memory: "1Gi"
-          cpu: "300m"
     env: 
       - name: GCP_FILE_MATCH_REGEX
         value: "2023-01-03/.*\\.gz"
@@ -26,6 +19,13 @@ spec:
           secretKeyRef:
             name: es-cluster-es-elastic-user
             key: elastic
+    resources:
+      limits:
+        memory: "2Gi"
+        cpu: "2500m"
+      requests: 
+        memory: "1Gi"
+        cpu: "300m"
     volumeMounts:
       - name: config-volume
         mountPath: /usr/share/logstash/config
