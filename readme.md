@@ -181,7 +181,7 @@ Note you can run multiple logstash instances with different `GCP_FILE_MATCH_REGE
 
 After a while you will have the dataset fully loaded, in our case we have ingested a little bit over 5.5 billion documents that would fall between 1st January 2023 and 7th January 2023, the Rally tracks are also considering the data to exist within this time range.
 
-<kbd><img src="screenshots/2023-07-25-12-04-28.png" width="640"></kbd>
+<kbd><img src="screenshots/2023-07-25-12-04-28.png"></kbd>
 
 ## 4 - Running the benchmarks with Rally
 
