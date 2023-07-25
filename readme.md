@@ -242,7 +242,8 @@ It expects the csv to be in the following format:
 | e833bb53-b9a8-4342-bc03-cba989c13f17 | Jun 8, 2023 @ 06:09:05.000 | range | service_time | esg_logs | intel          | e2-standard-16   | OpenSearch        | 8cpu32ram                | 108.706    | 108.214    | 111.958    | 143.522    |
 
 which can be easily generated in Kibana using CSV export from a saved search, make sure you filter by `name: service_time` to get only the relevant metrics.
-<kbd><img src="screenshots/2023-07-25-14-03-33.png" width="640"></kbd>
+
+<img src="screenshots/2023-07-25-14-03-33.png">
 
 
 Once you get the CSV file, just feed it to `charts.py` and charts will come one the other side:
