@@ -46,8 +46,8 @@
         "query": {
           "range": {
             "metrics.size": {
-              "gte": 1,
-              "lte": 1000
+              "gte": 20,
+              "lte": 200
             }
           }
         }
@@ -77,77 +77,6 @@
             ]
           }
         }
-      }
-    },
-    {
-      "name": "query-string-on-message",
-      "operation-type": "search",
-      "index": "logs-benchmark-*",
-      "body": {
-        "query": {
-          "query_string": {
-            "query": "message: shield AND carp AND shark"
-          }
-        }
-      }
-    },
-    {
-      "name": "query-string-on-message-filtered",
-      "operation-type": "search",
-      "index": "logs-benchmark-*",
-      "body": {
-        "query": {
-          "bool": {
-            "must": [
-              {
-                "range": {
-                  "@timestamp": {
-                    "gte": "2023-01-01T00:00:00",
-                    "lt": "2023-01-03T00:00:00"
-                  }
-                }
-              },
-              {
-                "query_string": {
-                  "query": "message: shield AND carp AND shark"
-                }
-              }
-            ]
-          }
-        }
-      }
-    },
-    {
-      "name": "query-string-on-message-filtered-sorted-num",
-      "operation-type": "search",
-      "index": "logs-benchmark-*",
-      "body": {
-        "query": {
-          "bool": {
-            "must": [
-              {
-                "range": {
-                  "@timestamp": {
-                    "gte": "2023-01-01T00:00:00",
-                    "lt": "2023-01-03T00:00:00"
-                  }
-                }
-              },
-              {
-                "query_string": {
-                  "query": "message: shield AND carp AND shark"
-                }
-              }
-            ]
-          }
-        },
-        "sort": [
-          {
-            "metrics.size": {
-              "order": "desc"
-            }
-          }
-        ]
       }
     },
     {
@@ -515,7 +444,7 @@
                 "range": {
                   "metrics.size": {
                     "gte": 1,
-                    "lte": 1000
+                    "lte": 100
                   }
                 }
               }
@@ -541,7 +470,7 @@
                 "range": {
                   "metrics.size": {
                     "gte": 1,
-                    "lte": 1000
+                    "lte": 100
                   }
                 }
               }
@@ -566,8 +495,8 @@
               {
                 "range": {
                   "metrics.size": {
-                    "gte": 1,
-                    "lte": 30
+                    "gte": 10,
+                    "lte": 20
                   }
                 }
               }
@@ -587,8 +516,8 @@
               {
                 "range": {
                   "metrics.size": {
-                    "gte": 1,
-                    "lte": 42
+                    "gte": 20,
+                    "lte": 30
                   }
                 }
               }
@@ -648,6 +577,7 @@
       "name": "range-auto-date-histo-with-metrics",
       "operation-type": "search",
       "index": "logs-benchmark-*",
+      "request-timeout": 7200,
       "body": {
         "size": 0,
         "aggs": {
@@ -839,5 +769,76 @@
             }
           }
         }
+      }
+    },
+    {
+      "name": "query-string-on-message",
+      "operation-type": "search",
+      "index": "logs-benchmark-*",
+      "body": {
+        "query": {
+          "query_string": {
+            "query": "message: monkey jackal bear"
+          }
+        }
+      }
+    },
+    {
+      "name": "query-string-on-message-filtered",
+      "operation-type": "search",
+      "index": "logs-benchmark-*",
+      "body": {
+        "query": {
+          "bool": {
+            "must": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "2023-01-03T00:00:00",
+                    "lt": "2023-01-03T10:00:00"
+                  }
+                }
+              },
+              {
+                "query_string": {
+                  "query": "message: monkey jackal bear"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "query-string-on-message-filtered-sorted-num",
+      "operation-type": "search",
+      "index": "logs-benchmark-*",
+      "body": {
+        "query": {
+          "bool": {
+            "must": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "2023-01-03T00:00:00",
+                    "lt": "2023-01-03T10:00:00"
+                  }
+                }
+              },
+              {
+                "query_string": {
+                  "query": "message: monkey jackal bear"
+                }
+              }
+            ]
+          }
+        },
+        "sort": [
+          {
+            "@timestamp": {
+              "order": "asc"
+            }
+          }
+        ]
       }
     }
