@@ -3,7 +3,7 @@ kind: Job
 metadata:
   name: rally-os-big5
 spec:
-  completions: 10
+  completions: 100
   template:
     metadata:
       name: rally-os-big5
@@ -45,7 +45,7 @@ spec:
                   name: os-cluster-admin-password
                   key: password
             - name: META
-              value: "product:OpenSearch,cluster-topology:6d,cluster-config:12cpu64ram,arch:intel,machine:e2-standard-32,benchmark-run:july25"
+              value: "product:OpenSearch,cluster-topology:6d,cluster-config:12cpu64ram,arch:intel,machine:e2-standard-32,benchmark-run:july31"
           args:
             [
               "race",

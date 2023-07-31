@@ -35,7 +35,7 @@ spec:
         - ReadWriteOnce
         resources:
           requests:
-            storage: 500Gi
+            storage: 600Gi
 ---
 apiVersion: kibana.k8s.elastic.co/v1
 kind: Kibana
