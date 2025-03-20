@@ -9,7 +9,7 @@
 Use [this terraform script](./terraform/main.tf) to provision a Kubernetes cluster with:
 - 1 Node pool for Elasticsearch with 6 `e2-standard-32` machines (128GB RAM and 32 CPUs)
 - 1 Node pool for OpenSearch with 6 `e2-standard-32` machines (128GB RAM and 32 CPUs)
-- 1 Node pool for Rally with 2 `t2a-standard-16` machines (64GB RAM and 16 CPUs)
+- 1 Node pool for Rally with 3 `t2a-standard-16` machines (64GB RAM and 16 CPUs)
 
 
 ## Creating Elasticsearch and Opensearch clusters
@@ -29,14 +29,14 @@ kubectl apply -f k8s/elasticsearch-cluster.yml
 
 Get the elastic username and password with:
 
-```c
+```bash
 kubectl get secret es-cluster-es-elastic-user -o "jsonpath={.data.elastic}" | base64 -d; echo
 ```
 
-Open up the Kibana port and access it under http://localhost:5601
+Open up the Kibana port and access it under https://localhost:9243
 
-```c
- kubectl port-forward service/es-cluster-kb-http 9243:5601
+```bash
+kubectl port-forward service/es-cluster-kb-http 9243:5601
 ```
 
 #### Configure and create the datastream
@@ -45,7 +45,7 @@ Go to [this section](./datastreams/elasticsearch.md) and copy and paste to a Kib
 
 ### Install OpenSearch Kubernetes Operator
 ```bash
-helm repo add opensearch-operator https://opster.github.io/opensearch-k8s-operator/
+helm repo add opensearch-operator https://opensearch-project.github.io/opensearch-k8s-operator/
 helm install opensearch-operator opensearch-operator/opensearch-operator
 ```
 
@@ -55,10 +55,10 @@ Deploy the OpenSearch Kubernetes Manifest [here](./k8s/opensearch-cluster.yml)
 kubectl apply -f k8s/opensearch-cluster.yml
 ```
 
-Open up the Dashboards port and access it under http://localhost:5601
+Open up the Dashboards port and access it under https://localhost:5601
 
-```c
-  kubectl port-forward service/opensearch-dashboards-service 5601:5601
+```bash
+kubectl port-forward service/opensearch-dashboards-service 5601:5601
 ```
 
 Default username in OpenSearch is `admin` with password `admin`
@@ -92,11 +92,11 @@ Similarly OpenSearch:
 
 ## 2 - Generating the dataset
 
-The [generate.sh](./dataset/generate.sh) script generates a dataset using the [elastic integration corpus generator tool](https://github.com/elastic/), creating 1024 files with each file's size set to 1GB. The generator uses a template file and a YAML configuration file for content generation. The resulting files are converted to .ndjson format, gzipped, and then uploaded to a specified Google Cloud Storage bucket using gsutil cp. Each file is uploaded to the bucket, and the script removes the local gzipped files afterward. 
+The [generate.sh](./dataset/generate.sh) script generates a dataset using the [elastic integration corpus generator tool](https://github.com/elastic/elastic-integration-corpus-generator-tool), creating 1024 files with each file's size set to 1GB. The generator uses a template file and a YAML configuration file for content generation. The resulting files are converted to .ndjson format, gzipped, and then uploaded to a specified Google Cloud Storage bucket using gsutil cp. Each file is uploaded to the bucket, and the script removes the local gzipped files afterward. 
 
 To run the script, the following dependencies are required:
   - `elastic-integration-corpus-generator-tool`: the script should point to the correct full path of this tool using the GENERATOR variable. The binaries of the elastic integration corpus generator tool are also provided in the repository for ARM and Intel architectures, in the `dataset/bin` folder.
-  - `gsutil`: the command-line tool provided by Google Cloud SDK for interacting with Google Cloud Storage. 
+  - `gcloud CLI`: the command-line tool to manage Google Cloud resources. 
   - `gzip`: This is a standard Unix tool used for file compression and decompression. It is used in the script to gzip the generated files before uploading them to the bucket.
 
 example: 
@@ -106,43 +106,20 @@ export GENERATOR=/full/path/to/elastic-integration-corpus-generator-tool-arm
 # Where the dataset should be written
 export CORPORA_ROOT=/full/path/to/dataset/generated
 export CONFIG=config-1.yml
-export BUCKET=gs://my-gcp-bucket/2023-01-01/
+export BUCKET=gs://<bucket_id>
 ```
 
 
 
 ## 3 - Ingesting the dataset
 
-Now that our data is in a Google Cloud Storage bucket, we will use the `google-cloud-storage` input plugin for Logstash, and we are also going to need the `logstash-output-opensearch` to send data to OpenSearch. Those two plugins dont come installed by default in Logstash, luckly this can be easily fixed with a custom Docker image, for which a [Dockerfile](./logstash-custom/Dockerfile) is provided.
+Now that our data is in a Google Cloud Storage bucket, we will use the `google-cloud-storage` input plugin for Logstash, and we are also going to need the `logstash-output-opensearch` to send data to OpenSearch. Those two plugins don't come installed by default in Logstash, luckily this can be easily fixed with a custom Docker image, for which a [Dockerfile](./logstash-custom/Dockerfile) is provided.
 
-Let's build our custom Logstash image using the Makefile in `logstash-custom/Makefile`, the image is multi-arch so it will work on both ARM and Intel machines, you just need to change the `$TAG` variable to match your docker username, the makefile will use docker buildx to build the image and push to the repository.
-
-```makefile
-TAG := ugosan/logstash-custom:8.8.2-dev
-
-ARM_TAG := $(TAG)-manifest-arm64v8
-AMD_TAG := $(TAG)-manifest-amd64
-
-all: build push pull
-
-build:
-	@echo "\n::: Building $(ARM_TAG)"
-	docker buildx build --push -f Dockerfile --platform linux/arm64/v8 --tag $(ARM_TAG) .
-	@echo "\n::: Building $(AMD_TAG)"
-	docker buildx build --push -f Dockerfile --platform linux/amd64 --tag $(AMD_TAG) .
-	docker manifest create $(TAG) --amend $(ARM_TAG) --amend $(AMD_TAG)
-	@echo "\n::: Building done!"
-
-push:
-	docker manifest push $(TAG) --purge
-
-pull:
-	docker pull $(TAG)
-```
+Let's build our custom Logstash image using the Makefile in `logstash-custom/Makefile`. The image is multi-arch, so it will work on both ARM and Intel machines. You just need to change the `$TAG` variable to match your docker username, and the [Makefile](./logstash-custom/Makefile) will use `docker buildx` to build the image and push to the repository.
 
 Just run `make` in `logstash-custom` and you will be good to go.
 
-Now lets use Logstash to index the data from GCS to Elasticsearch and OpenSearch, for which two Kubernetes manifests are provided: `logstash-es.yml` and `logstash-os.yml`, but before you run them, make sure you included your `credentials.json` from GCP into `logstash-gcp-credentials.yml`.
+Now lets use Logstash to index the data from GCS to Elasticsearch and OpenSearch, for which two Kubernetes manifests are provided: `logstash-es.yml` and `logstash-os.yml`. Before you run them, make sure you included your `credentials.json` from GCP into `logstash-gcp-credentials.yml`.
 
 Get a base64 encoded version of your `credentials.json` and add it to `logstash-gcp-credentials.yml` then apply it:
 
@@ -150,7 +127,7 @@ Get a base64 encoded version of your `credentials.json` and add it to `logstash-
 kubectl apply -f logstash-gcp-credentials.yml
 ```
 
-The Logstash Pods must be allocated to a separate nodepool from Elasticsearch and OpenSearch ones, for which we will be using the `rally-nodes` nodepool we have configured in terraform. We also specify the `image` we have just made and the `GCP_FILE_MATCH_REGEX` to fetch the `*.ndjson.gz` dataset files. 
+The Logstash Pods must be allocated to a separate nodepool from Elasticsearch and OpenSearch ones, for which we will be using the `rally-nodes` nodepool we have configured in terraform. We also specify the `image` we have just made and the `GCP_FILE_MATCH_REGEX` to fetch the `*.ndjson.gz` dataset files. Don't forget to change the `bucket_id` and `metadata_key` in `big5-benchmark.conf`.
 
 ```yml
 apiVersion: v1
@@ -162,19 +139,19 @@ spec:
     cloud.google.com/gke-nodepool: rally-nodes
   containers:
   - name: logstash
-    image: ugosan/logstash-custom:8.8.2-dev
+    image: ugosan/logstash-custom:8.17.3-dev
     imagePullPolicy: Always
     env: 
       - name: GCP_FILE_MATCH_REGEX
-        value: "2023-01-03/.*\\.gz"
+        value: ".*\\.gz"
 ...
 ```
 
 
 Run the Logstash instances and wait (probably a lot) until all the data is indexed:
 
-```
-kubectl apply -f logstash-es.yml logstash-os.yml
+```bash
+kubectl apply -f k8s/logstash-es.yml -f k8s/logstash-os.yml
 ```
 
 Note you can run multiple logstash instances with different `GCP_FILE_MATCH_REGEX` to speed up the process, don't worry about data being ingested twice because the document id's are unique and both Elasticsearch and OpenSearch will reject "upserts" to the data. The Google Cloud Storage plugin also writes a metadata field to every file it has already ingested (set it in `metadata_key`), also make sure to adjust the `pipeline.batch.size`. All those configurations can be done in the `ConfigMap` at the bottom of `logstash-es.yml` and `logstash-os.yml`
@@ -187,12 +164,12 @@ After a while you will have the dataset fully loaded, in our case we have ingest
 
 Rally is an open-source tool developed by Elastic for benchmarking and performance testing of Elasticsearch only. However, since OpenSearch is a fork of Elasticsearch and we are not using anything exclusive to Elasticsearch like Runtime Fields (schema-on-read) in our searches, we can safely assume both solutions will work for our set of queries, we just need to bypass the code where the system verification is made.
 
-Just like for Logstash, we also have a custom Dockerfile and a Makefile to build the docker image. In the Dockerfile we are just reusing the elastic/rally:2.8.0 image and injecting a modified client library into it (one that does not check if the counterpart is Elasticsearch). We also copy a custom track we are calling "big5" that will run a series of queries against the logs-benchmark-* datastreams.
+Just like for Logstash, we also have a custom Dockerfile and a Makefile to build the docker image. In the Dockerfile we are just reusing the elastic/rally:2.11.0 image and injecting a modified client library into it (one that does not check if the counterpart is Elasticsearch). We also copy a custom track we are calling "big5" that will run a series of queries against the `logs-benchmark-*` datastreams.
 
 Change the `$TAG` to match your username and repository, then run `make` inside `rally-custom`
 
 ```makefile
-TAG := ugosan/rally-custom:2.8.0-dev
+TAG := ugosan/rally-custom:2.11.0-dev
 ARM_TAG := $(TAG)-manifest-arm64v8
 AMD_TAG := $(TAG)-manifest-amd64
 
@@ -225,7 +202,7 @@ kubectl apply -f k8s/rally-config.yml
 Then the rally pods:
 
 ```bash
- kubectl apply -f rally-big5-es.yml rally-big5-os.yml
+kubectl apply -f k8s/rally-big5-es.yml -f k8s/rally-big5-os.yml
 ```
 
 

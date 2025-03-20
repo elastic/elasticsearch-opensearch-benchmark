@@ -1,7 +1,7 @@
 #!/bin/bash
 # this script build a multi arch image and pushes it to $TAG
 
-export TAG=ugosan/logstash-custom:8.8.2-dev
+export TAG=ugosan/logstash-custom:8.17.3-dev
 export ARM_TAG="${TAG}-manifest-arm64v8"
 export AMD_TAG="${TAG}-manifest-amd64"
 

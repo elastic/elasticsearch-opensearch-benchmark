@@ -1,17 +1,17 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: logstash-es-day3
+  name: logstash-es-<suffix>
 spec:
   nodeSelector:
     cloud.google.com/gke-nodepool: rally-nodes
   containers:
   - name: logstash
-    image: ugosan/logstash-custom:8.8.2-dev
+    image: ugosan/logstash-custom:8.17.3-dev
     imagePullPolicy: Always
-    env: 
+    env:
       - name: GCP_FILE_MATCH_REGEX
-        value: "2023-01-03/.*\\.gz"
+        value: ".*\\.gz"
       - name: USERNAME
         value: "elastic"
       - name: PASSWORD
@@ -75,13 +75,13 @@ data:
   big5-benchmark.conf: |
     input {
         google_cloud_storage {
-            bucket_id => "my-benchmarks-datasets"
+            bucket_id => "<bucket_id>"
             file_matches => "${GCP_FILE_MATCH_REGEX}"
             processed_db_path => "/tmp/logstash/processed_db/db"
             codec => json_lines
             json_key_file => "/tmp/logstash/credentials/credentials.json"
             interval => 300
-            metadata_key => "x-goog-meta-benchmarks-elasticsearch-22-july"
+            metadata_key => "x-goog-meta-benchmarks-elasticsearch-<ingest_date>"
         }
     }
 

@@ -3,7 +3,7 @@ kind: Elasticsearch
 metadata:
   name: es-cluster
 spec:
-  version: 8.8.2
+  version: 8.17.3
   http:
     service:
       spec:
@@ -42,7 +42,7 @@ kind: Kibana
 metadata:
   name: es-cluster
 spec:
-  version: 8.8.2
+  version: 8.17.3
   http:
     service:
       spec:

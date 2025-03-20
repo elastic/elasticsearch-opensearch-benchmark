@@ -15,7 +15,6 @@
 # specific language governing permissions and limitations
 # under the License.
 
-import re
 import warnings
 from typing import Any, Iterable, Mapping, Optional
 
@@ -76,22 +75,31 @@ class _ProductChecker:
     @classmethod
     def check_product(cls, headers, response):
         # type: (dict[str, str], dict[str, str]) -> int
-        """This class was supposed to verify that the server we're talking to is Elasticsearch.
-        It actually returns
+        """This class was supposed to verify that the server we are talking to is Elasticsearch.
+        It just returns True
         """
+
         return True
-        
+
 
 class RallySyncElasticsearch(Elasticsearch):
     def __init__(self, *args, **kwargs):
         distribution_version = kwargs.pop("distribution_version", None)
+        distribution_flavor = kwargs.pop("distribution_flavor", None)
         super().__init__(*args, **kwargs)
         self._verified_elasticsearch = None
+        self.distribution_version = distribution_version
+        self.distribution_flavor = distribution_flavor
 
-        if distribution_version:
-            self.distribution_version = versions.Version.from_string(distribution_version)
-        else:
-            self.distribution_version = None
+    @property
+    def is_serverless(self):
+        return versions.is_serverless(self.distribution_flavor)
+
+    def options(self, *args, **kwargs):
+        new_self = super().options(*args, **kwargs)
+        new_self.distribution_version = self.distribution_version
+        new_self.distribution_flavor = self.distribution_flavor
+        return new_self
 
     def perform_request(
         self,
@@ -134,9 +142,12 @@ class RallySyncElasticsearch(Elasticsearch):
         # Converts all parts of a Accept/Content-Type headers
         # from application/X -> application/vnd.elasticsearch+X
         # see https://github.com/elastic/elasticsearch/issues/51816
-        if self.distribution_version is not None and self.distribution_version >= versions.Version.from_string("8.0.0"):
-            _mimetype_header_to_compat("Accept", request_headers)
-            _mimetype_header_to_compat("Content-Type", request_headers)
+        if not self.is_serverless:
+            if versions.is_version_identifier(self.distribution_version) and (
+                versions.Version.from_string(self.distribution_version) >= versions.Version.from_string("8.0.0")
+            ):
+                _mimetype_header_to_compat("Accept", headers)
+                _mimetype_header_to_compat("Content-Type", headers)
 
         if params:
             target = f"{path}?{_quote_query(params)}"

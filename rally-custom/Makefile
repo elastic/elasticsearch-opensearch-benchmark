@@ -1,4 +1,4 @@
-TAG := ugosan/rally-custom:2.8.0-dev
+TAG := ugosan/rally-custom:2.11.0-dev
 ARM_TAG := $(TAG)-manifest-arm64v8
 AMD_TAG := $(TAG)-manifest-amd64
 

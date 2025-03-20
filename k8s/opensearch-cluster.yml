@@ -17,14 +17,14 @@ spec:
     httpPort: 9200
     serviceName: os-cluster
     setVMMaxMapCount: true
-    version: 2.8.0
+    version: 2.19.1
     pluginsList: []
     drainDataNodes: true
   dashboards:
     tls:
       enable: true
       generate: true
-    version: 2.8.0
+    version: 2.19.1
     enable: true
     replicas: 1
     nodeSelector:

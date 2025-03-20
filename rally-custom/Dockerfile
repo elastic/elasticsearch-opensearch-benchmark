@@ -1,4 +1,4 @@
-FROM elastic/rally:2.8.0
+FROM elastic/rally:2.11.0
 ENV PYTHONUNBUFFERED=1
 
 # bypass system verifications

@@ -3,7 +3,7 @@ kind: Job
 metadata:
   name: rally-os-big5
 spec:
-  completions: 100
+  completions: 50
   template:
     metadata:
       name: rally-os-big5
@@ -29,7 +29,7 @@ spec:
           effect: "NoSchedule"
       containers:
         - name: rally
-          image: ugosan/rally-custom:2.8.0-dev
+          image: ugosan/rally-custom:2.11.0-dev
           imagePullPolicy: Always
           env:
             - name: HOSTPORT
@@ -45,7 +45,7 @@ spec:
                   name: os-cluster-admin-password
                   key: password
             - name: META
-              value: "product:OpenSearch,cluster-topology:6d,cluster-config:12cpu64ram,arch:intel,machine:e2-standard-32,benchmark-run:july31"
+              value: "product:OpenSearch,cluster-topology:6d,cluster-config:12cpu64ram,arch:intel,machine:e2-standard-32,benchmark-run:<run_date>"
           args:
             [
               "race",
