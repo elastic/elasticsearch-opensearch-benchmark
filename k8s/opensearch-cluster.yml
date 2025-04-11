@@ -38,18 +38,18 @@ spec:
         cpu: "200m"
   nodePools:
     - component: data
-      replicas: 6
+      replicas: 4
       nodeSelector:
         cloud.google.com/gke-nodepool: opensearch-nodepool-32
-      diskSize: "500Gi"
-      jvm: -Xmx31G -Xms31G
+      diskSize: "600Gi"
+      jvm: -Xmx8G -Xms8G
       resources:
         requests:
-          memory: "64Gi"
-          cpu: 16
+          memory: "16Gi"
+          cpu: 8
         limits:
-          memory: "64Gi"
-          cpu: 16
+          memory: "16Gi"
+          cpu: 8
       roles:
         - "data"
         - "cluster_manager"
