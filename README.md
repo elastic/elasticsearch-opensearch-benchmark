@@ -7,9 +7,9 @@
 
 
 Use [this terraform script](./terraform/main.tf) to provision a Kubernetes cluster with:
-- 1 Node pool for Elasticsearch with 6 `e2-standard-32` machines (128GB RAM and 32 CPUs)
-- 1 Node pool for OpenSearch with 6 `e2-standard-32` machines (128GB RAM and 32 CPUs)
-- 1 Node pool for Rally with 3 `t2a-standard-16` machines (64GB RAM and 16 CPUs)
+- 1 Node pool for Elasticsearch with 1 `n2-custom-36-81920` machines (80 RAM and 36 CPUs)
+- 1 Node pool for OpenSearch with 1 `n2-custom-36-81920` machines (80GB RAM and 36 CPUs)
+- 1 Node pool for Rally with 2 `n2-standard-16` machines (64GB RAM and 16 CPUs)
 
 
 ## Creating Elasticsearch and Opensearch clusters
@@ -70,9 +70,9 @@ Go to [this section](./datastreams/opensearch.md) and copy and paste to a Dashbo
 
 ## Verifying 
 
-Your Kubernetes cluster should look something like below, with 6 nodes for Elasticsearch and 6 for OpenSearch.
+Your Kubernetes cluster should look something like below, with 4 nodes for Elasticsearch and 4 for OpenSearch.
 
-<kbd><img src="screenshots/2023-07-25-12-19-48.png" ></kbd>
+<kbd><img src="screenshots/2025-04-14-13-19-34.png" ></kbd>
 
 We can use the _cat nodes API to quickly inspect we have both solutions under the same conditions, run the following in Dev Tools:
 
@@ -80,13 +80,13 @@ We can use the _cat nodes API to quickly inspect we have both solutions under th
 GET _cat/nodes?v&h=ip,name,cpu,ram.max,heap.max,heap.current,heap.percent,diskAvail,diskUsed&s=name
 ```
 
-Elasticsearch should show `ram.max` as 64gb and `heap.max` as 31gb:
+Elasticsearch should show `ram.max` as 16gb and `heap.max` as 8gb:
 
-<kbd><img src="screenshots/2023-07-25-12-24-41.png" ></kbd>
+<kbd><img src="screenshots/2025-04-14-13-25-26.png" ></kbd>
 
 Similarly OpenSearch:
 
-<kbd><img src="screenshots/2023-07-25-12-25-39.png" ></kbd>
+<kbd><img src="screenshots/2025-04-14-13-27-47.png" ></kbd>
 
 
 
