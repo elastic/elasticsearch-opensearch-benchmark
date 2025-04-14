@@ -3,7 +3,6 @@ kind: Job
 metadata:
   name: rally-es-big5
 spec:
-  completions: 100
   template:
     metadata:
       name: rally-es-big5
@@ -29,7 +28,7 @@ spec:
           effect: "NoSchedule"
       containers:
         - name: rally
-          image: ugosan/rally-custom:2.8.0-dev
+          image: ugosan/rally-custom:2.11.0-dev
           imagePullPolicy: Always
           env:
             - name: HOSTPORT
@@ -42,7 +41,7 @@ spec:
                   name: es-cluster-es-elastic-user
                   key: elastic
             - name: META
-              value: "product:Elasticsearch,cluster-topology:6d,cluster-config:12cpu64ram,arch:intel,machine:e2-standard-32,benchmark-run:july31"
+              value: "product:Elasticsearch,cluster-topology:6d,cluster-config:32cpu64ram,arch:intel,machine:n2-custom-36-81920,benchmark-run:<run_date>"
           args:
             [
               "race",

@@ -1,7 +1,7 @@
 version: '3'
 services:
   test: 
-    image: ugosan/rally-custom:2.8.0-dev
+    image: ugosan/rally-custom:2.11.0-dev
     command: > 
       race --track-path=/rally/custom_tracks/big5
       --target-hosts=34.28.235.192:9200 

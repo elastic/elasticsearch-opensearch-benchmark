@@ -15,31 +15,31 @@ resource "google_container_cluster" "my_cluster" {
 resource "google_container_node_pool" "elasticsearch_nodes_32cpu" {
   name   	= "elasticsearch-nodepool-32"
   cluster	= google_container_cluster.my_cluster.id
-  node_count = 6
+  node_count = 1
 
   node_config {
-	machine_type = "e2-standard-32"
-	disk_size_gb = 50
+	machine_type = "n2-custom-36-81920" # 36 CPUs, 80GB RAM, 64GB for data + 16GB for utilities
+	disk_size_gb = 3600
   }
 }
 
 resource "google_container_node_pool" "opensearch_nodes_32cpu" {
   name   	= "opensearch-nodepool-32"
   cluster	= google_container_cluster.my_cluster.id
-  node_count = 6
+  node_count = 1
 
   node_config {
-	machine_type = "e2-standard-32"
-	disk_size_gb = 50
+	machine_type = "n2-custom-36-81920" # 36 CPUs, 80GB RAM, 64GB for data + 16GB for utilities
+	disk_size_gb = 3600
   }
 }
 resource "google_container_node_pool" "rally_nodes" {
   name   	= "rally-nodes"
   cluster	= google_container_cluster.my_cluster.id
-  node_count = 3
+  node_count = 2
 
   node_config {
-	machine_type = "e2-standard-16"
+	machine_type = "n2-standard-16"
 	disk_size_gb = 40
   }
 }

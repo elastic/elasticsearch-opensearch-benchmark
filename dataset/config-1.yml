@@ -2,7 +2,7 @@
   fuzinness: 0.7
   range: 
     min: 1672531200 #Sunday, January 1, 2023 12:00:00 AM
-    max: 1672617599 #Sunday, January 1, 2023 11:59:59 PM
+    max: 1673135999 #Saturday, January 7, 2023 11:59:59 PM
 - name: process.name
   enum: ["journal", "kernel", "systemd", "cron", "sshd", "httpd", "udev"]
 - name: metrics.tmin

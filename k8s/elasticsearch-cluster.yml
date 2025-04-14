@@ -3,14 +3,14 @@ kind: Elasticsearch
 metadata:
   name: es-cluster
 spec:
-  version: 8.8.2
+  version: 8.17.3
   http:
     service:
       spec:
         type: LoadBalancer
   nodeSets:
   - name: default
-    count: 6
+    count: 4
     podTemplate:
       spec:
         nodeSelector:
@@ -24,9 +24,12 @@ spec:
         containers:
           - name: elasticsearch
             resources:
+              requests:
+                memory: 16Gi
+                cpu: 8
               limits:
-                memory: 64Gi
-                cpu: 16
+                memory: 16Gi
+                cpu: 8
     volumeClaimTemplates:
     - metadata:
         name: elasticsearch-data
@@ -42,7 +45,7 @@ kind: Kibana
 metadata:
   name: es-cluster
 spec:
-  version: 8.8.2
+  version: 8.17.3
   http:
     service:
       spec:
