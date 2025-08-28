@@ -3,46 +3,46 @@ kind: Elasticsearch
 metadata:
   name: es-cluster
 spec:
-  version: 8.8.2
+  version: 9.1.2
   http:
     service:
       spec:
         type: LoadBalancer
   nodeSets:
-  - name: default
-    count: 6
-    podTemplate:
-      spec:
-        nodeSelector:
-          cloud.google.com/gke-nodepool: elasticsearch-nodepool-32
-        initContainers:
-        - name: sysctl
-          securityContext:
-            privileged: true
-            runAsUser: 0
-          command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']
-        containers:
-          - name: elasticsearch
+    - name: default
+      count: 3
+      podTemplate:
+        spec:
+          nodeSelector:
+            cloud.google.com/gke-nodepool: elasticsearch-nodepool-big5
+          initContainers:
+            - name: sysctl
+              securityContext:
+                privileged: true
+                runAsUser: 0
+              command: ["sh", "-c", "sysctl -w vm.max_map_count=262144"]
+          containers:
+            - name: elasticsearch
+              resources:
+                limits:
+                  memory: 12Gi
+                  cpu: 3
+      volumeClaimTemplates:
+        - metadata:
+            name: elasticsearch-data
+          spec:
+            accessModes:
+              - ReadWriteOnce
             resources:
-              limits:
-                memory: 64Gi
-                cpu: 16
-    volumeClaimTemplates:
-    - metadata:
-        name: elasticsearch-data
-      spec:
-        accessModes:
-        - ReadWriteOnce
-        resources:
-          requests:
-            storage: 600Gi
+              requests:
+                storage: 500Gi
 ---
 apiVersion: kibana.k8s.elastic.co/v1
 kind: Kibana
 metadata:
   name: es-cluster
 spec:
-  version: 8.8.2
+  version: 9.1.2
   http:
     service:
       spec:
@@ -50,7 +50,7 @@ spec:
   podTemplate:
     spec:
       nodeSelector:
-          cloud.google.com/gke-nodepool: elasticsearch-nodepool-32
+        cloud.google.com/gke-nodepool: kibana-nodepool-big5
   count: 1
   elasticsearchRef:
     name: es-cluster

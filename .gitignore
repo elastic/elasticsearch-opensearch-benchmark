@@ -6,3 +6,4 @@ credentials.json
 .terraform*
 *.tfstate*
 __pycache__/
+.DS_Store

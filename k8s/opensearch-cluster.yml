@@ -17,18 +17,18 @@ spec:
     httpPort: 9200
     serviceName: os-cluster
     setVMMaxMapCount: true
-    version: 2.8.0
+    version: 3.1.0
     pluginsList: []
     drainDataNodes: true
   dashboards:
     tls:
       enable: true
       generate: true
-    version: 2.8.0
+    version: 3.1.0
     enable: true
     replicas: 1
     nodeSelector:
-      cloud.google.com/gke-nodepool: opensearch-nodepool-32
+      cloud.google.com/gke-nodepool: dashboards-nodepool-big5
     resources:
       requests:
         memory: "512Mi"
@@ -40,16 +40,16 @@ spec:
     - component: data
       replicas: 6
       nodeSelector:
-        cloud.google.com/gke-nodepool: opensearch-nodepool-32
+        cloud.google.com/gke-nodepool: opensearch-nodepool-big5
       diskSize: "500Gi"
-      jvm: -Xmx31G -Xms31G
+      jvm: -Xmx6G -Xms6G
       resources:
         requests:
-          memory: "64Gi"
-          cpu: 16
+          memory: "12Gi"
+          cpu: 3
         limits:
-          memory: "64Gi"
-          cpu: 16
+          memory: "12Gi"
+          cpu: 3
       roles:
         - "data"
         - "cluster_manager"

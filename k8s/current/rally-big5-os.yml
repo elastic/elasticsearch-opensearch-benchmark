@@ -1,48 +1,51 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: rally-es-big5
+  name: rally-big5-os
 spec:
   completions: 100
   template:
     metadata:
-      name: rally-es-big5
-      labels: 
-        app: rally-elasticsearch
+      name: rally-big5-os
+      labels:
+        app: rally-opensearch
     spec:
       restartPolicy: Never
       nodeSelector:
-        cloud.google.com/gke-nodepool: rally-nodes
+        cloud.google.com/gke-nodepool: os-rally-node-big5
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: app
-                operator: In
-                values:
-                - rally-opensearch
-            topologyKey: kubernetes.io/hostname
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - rally-elasticsearch
+              topologyKey: kubernetes.io/hostname
       tolerations:
         - key: "kubernetes.io/arch"
           operator: "Exists"
           effect: "NoSchedule"
       containers:
         - name: rally
-          image: ugosan/rally-custom:2.8.0-dev
+          image: docker.elastic.co/employees/sachinfrayne/rally-custom-big5:2
           imagePullPolicy: Always
           env:
             - name: HOSTPORT
-              value: "es-cluster-es-http:9200"
+              value: "os-cluster.default.svc.cluster.local:9200"
             - name: USERNAME
-              value: "elastic"
+              valueFrom:
+                secretKeyRef:
+                  name: os-cluster-admin-password
+                  key: username
             - name: PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: es-cluster-es-elastic-user
-                  key: elastic
+                  name: os-cluster-admin-password
+                  key: password
             - name: META
-              value: "product:Elasticsearch,cluster-topology:6d,cluster-config:12cpu64ram,arch:intel,machine:e2-standard-32,benchmark-run:july31"
+              value: "product:Opensearch,product-version:Opensearch-3.1.0,benchmark-dataset:openai_vector,benchmark-id:big5-17-aug-2025-9.1.2-vs-3.1.0,benchmark-name:OS-BIG5"
           args:
             [
               "race",
@@ -51,9 +54,9 @@ spec:
               "--pipeline=benchmark-only",
               "--user-tags=$(META)",
               "--on-error=abort",
-              "--client-options=use_ssl:true,verify_certs:false,basic_auth_user:'$(USERNAME)',basic_auth_password:'$(PASSWORD)'",
+              "--client-options=timeout:360,use_ssl:true,verify_certs:false,basic_auth_user:'$(USERNAME)',basic_auth_password:'$(PASSWORD)'",
               "--challenge=big5",
-              "--exclude-tasks=delete-index,index-append,type:index,type:create-index,type:raw-request" 
+              "--exclude-tasks=delete-index,index-append,type:index,type:create-index,type:raw-request",
             ]
           volumeMounts:
             - name: rally-config-volume
@@ -61,8 +64,10 @@ spec:
               subPath: "rally.ini"
             - name: rally-base-dir
               mountPath: "/rally/.rally"
-            - name: rally-tracks-data-es
+            - name: rally-tracks-data-os
               mountPath: "/rally-tracks-cache"
+      imagePullSecrets:
+        - name: regcred
       volumes:
         - name: rally-config-volume
           configMap:
@@ -72,9 +77,9 @@ spec:
                 path: rally.ini
         - name: rally-base-dir
           emptyDir: {}
-        - name: rally-tracks-data-es
+        - name: rally-tracks-data-os
           persistentVolumeClaim:
-            claimName: rally-tracks-data-es
+            claimName: rally-tracks-data-os
       initContainers:
         - name: permission-fix
           image: busybox
@@ -84,4 +89,4 @@ spec:
             - mountPath: /rally/.rally
               name: rally-base-dir
             - mountPath: /rally-tracks-cache
-              name: rally-tracks-data-es
+              name: rally-tracks-data-os

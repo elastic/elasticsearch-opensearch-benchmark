@@ -2,35 +2,35 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: logstash-os-day1
+  name: logstash-os
 spec:
   nodeSelector:
-    cloud.google.com/gke-nodepool: rally-nodes
+    cloud.google.com/gke-nodepool: os-rally-node-big5
   containers:
-  - name: logstash
-    image: ugosan/logstash-custom:8.8.2-dev
-    imagePullPolicy: Always
-    env: 
-      - name: GCP_FILE_MATCH_REGEX
-        value: "2023-01-01/.*\\.gz"
-      - name: USERNAME
-        valueFrom:
-          secretKeyRef:
-            name: os-cluster-admin-password
-            key: username
-      - name: PASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: os-cluster-admin-password
-            key: password
-    resources:
+    - name: logstash
+      image: ugosan/logstash-custom:8.8.2-dev
+      imagePullPolicy: Always
+      env:
+        - name: GCP_FILE_MATCH_REGEX
+          value: "2025-08-06/.*\\.gz"
+        - name: USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: os-cluster-admin-password
+              key: username
+        - name: PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: os-cluster-admin-password
+              key: password
+      resources:
         limits:
-          memory: "2Gi"
-          cpu: "2500m"
-        requests: 
-          memory: "1Gi"
-          cpu: "300m"
-    volumeMounts:
+          memory: "12Gi"
+          cpu: "3"
+        requests:
+          memory: "12Gi"
+          cpu: "3"
+      volumeMounts:
         - name: config-volume
           mountPath: /usr/share/logstash/config
         - name: tmp-volume
@@ -39,29 +39,29 @@ spec:
           mountPath: /tmp/logstash/pipelines
         - name: credentials
           mountPath: /tmp/logstash/credentials
-  volumes:  
-  - name: tmp-volume
-    emptyDir: {}
-  - name: config-volume
-    configMap:
-      name: logstash-configmap-os
-      items:
-        - key: pipelines.yml
-          path: pipelines.yml
-        - key: logstash.yml
-          path: logstash.yml
-  - name: credentials
-    secret:
-      secretName: google-cloud-storage-credentials
-      items:
-      - key: encoded
-        path: credentials.json
-  - name: pipeline-volume
-    configMap:
-      name: logstash-configmap-os
-      items:
-        - key: big5-benchmark.conf
-          path: big5-benchmark.conf
+  volumes:
+    - name: tmp-volume
+      emptyDir: {}
+    - name: config-volume
+      configMap:
+        name: logstash-configmap-os
+        items:
+          - key: pipelines.yml
+            path: pipelines.yml
+          - key: logstash.yml
+            path: logstash.yml
+    - name: credentials
+      secret:
+        secretName: google-cloud-storage-credentials
+        items:
+          - key: encoded
+            path: credentials.json
+    - name: pipeline-volume
+      configMap:
+        name: logstash-configmap-os
+        items:
+          - key: big5-benchmark.conf
+            path: big5-benchmark.conf
 
 ---
 apiVersion: v1
@@ -72,35 +72,31 @@ data:
   pipelines.yml: |
     - pipeline.id: big5-benchmarks
       path.config: "/tmp/logstash/pipelines/big5-benchmark.conf"
-      pipeline.batch.size: 3000
+      pipeline.batch.size: 4000
   logstash.yml: |
     log.level: info
   big5-benchmark.conf: |
     input {
         google_cloud_storage {
-            bucket_id => "my-benchmarks-datasets"
+            bucket_id => "big5-benchmarking"
             file_matches => "${GCP_FILE_MATCH_REGEX}"
-            processed_db_path => "/tmp/logstash/processed_db"
             codec => json_lines
             json_key_file => "/tmp/logstash/credentials/credentials.json"
             interval => 300
-            metadata_key => "x-goog-meta-benchmarks-22-july"
+            metadata_key => "opensearch-27-aug-2025-attempt-1"
         }
     }
 
     filter {
-
         mutate {
             remove_field => ["path", "@version", "host", "data_stream"]
             copy => {
               "[@metadata][gcs][name]" => "[meta][file]"
             }
         }
-
     }
 
     output {
-
         opensearch {
             hosts => ["https://os-cluster.default.svc.cluster.local:9200"]
             ssl => true
@@ -111,5 +107,4 @@ data:
             user => "${USERNAME}"
             password => "${PASSWORD}"
         }
-        
     }

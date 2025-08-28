@@ -1,4 +1,3 @@
-
 ## Create the `logs-benchmark-policy` ILM Policy
 
 ```js

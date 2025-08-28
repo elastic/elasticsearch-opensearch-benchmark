@@ -51,15 +51,4 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 70Gi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: rally-tracks-data-os
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 70Gi
+      storage: 200Gi
