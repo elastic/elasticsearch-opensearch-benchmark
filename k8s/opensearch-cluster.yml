@@ -42,14 +42,14 @@ spec:
       nodeSelector:
         cloud.google.com/gke-nodepool: opensearch-nodepool-big5
       diskSize: "500Gi"
-      jvm: -Xmx6G -Xms6G
+      jvm: -Xmx28G -Xms28G
       resources:
         requests:
-          memory: "12Gi"
-          cpu: 3
+          memory: "56Gi"
+          cpu: 14
         limits:
-          memory: "12Gi"
-          cpu: 3
+          memory: "56Gi"
+          cpu: 14
       roles:
         - "data"
         - "cluster_manager"

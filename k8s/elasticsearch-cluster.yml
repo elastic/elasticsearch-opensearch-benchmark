@@ -10,7 +10,7 @@ spec:
         type: LoadBalancer
   nodeSets:
     - name: default
-      count: 3
+      count: 6
       podTemplate:
         spec:
           nodeSelector:
@@ -25,8 +25,8 @@ spec:
             - name: elasticsearch
               resources:
                 limits:
-                  memory: 12Gi
-                  cpu: 3
+                  memory: 56Gi
+                  cpu: 14
       volumeClaimTemplates:
         - metadata:
             name: elasticsearch-data
