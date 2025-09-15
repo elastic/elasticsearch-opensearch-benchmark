@@ -1,0 +1,89 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rally-es-logging
+spec:
+  completions: 100
+  template:
+    metadata:
+      name: rally-es-logging
+      labels:
+        app: rally-elasticsearch
+    spec:
+      restartPolicy: Never
+      nodeSelector:
+        cloud.google.com/gke-nodepool: es-rally-node-logging
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - rally-opensearch
+              topologyKey: kubernetes.io/hostname
+      tolerations:
+        - key: "kubernetes.io/arch"
+          operator: "Exists"
+          effect: "NoSchedule"
+      containers:
+        - name: rally
+          image: docker.elastic.co/employees/sachinfrayne/rally-custom-logging:2
+          imagePullPolicy: Always
+          env:
+            - name: HOSTPORT
+              value: "es-cluster-es-http:9200"
+            - name: USERNAME
+              value: "elastic"
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: es-cluster-es-elastic-user
+                  key: elastic
+            - name: META
+              value: "product:Elasticsearch,product-version:Elasticsearch-9.1.2,benchmark-dataset:openai_vector,benchmark-id:logging-17-aug-2025-9.1.2-vs-3.1.0,benchmark-name:ES-LOGGING"
+          args:
+            [
+              "race",
+              "--track-path=/rally/custom_tracks/logging",
+              "--target-hosts=$(HOSTPORT)",
+              "--pipeline=benchmark-only",
+              "--user-tags=$(META)",
+              "--on-error=abort",
+              "--client-options=timeout:360,use_ssl:true,verify_certs:false,basic_auth_user:'$(USERNAME)',basic_auth_password:'$(PASSWORD)'",
+              "--challenge=logging",
+              "--exclude-tasks=delete-index,index-append,type:index,type:create-index,type:raw-request",
+            ]
+          volumeMounts:
+            - name: rally-config-volume
+              mountPath: "/rally/.rally/rally.ini"
+              subPath: "rally.ini"
+            - name: rally-base-dir
+              mountPath: "/rally/.rally"
+            - name: rally-tracks-data-es
+              mountPath: "/rally-tracks-cache"
+      imagePullSecrets:
+        - name: regcred
+      volumes:
+        - name: rally-config-volume
+          configMap:
+            name: rally-config
+            items:
+              - key: rally.ini
+                path: rally.ini
+        - name: rally-base-dir
+          emptyDir: {}
+        - name: rally-tracks-data-es
+          persistentVolumeClaim:
+            claimName: rally-tracks-data-es
+      initContainers:
+        - name: permission-fix
+          image: busybox
+          command: ["sh", "-c"]
+          args: ["chmod -R 777 /rally/.rally /rally-tracks-cache"]
+          volumeMounts:
+            - mountPath: /rally/.rally
+              name: rally-base-dir
+            - mountPath: /rally-tracks-cache
+              name: rally-tracks-data-es
