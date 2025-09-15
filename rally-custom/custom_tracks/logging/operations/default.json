@@ -160,34 +160,6 @@
       }
     },
     {
-      "name": "asc_sort_timestamp",
-      "operation-type": "search",
-      "index": "logs-benchmark-*",
-      "body": {
-        "query": {
-          "match_all": {}
-        },
-        "sort" : [
-          {"@timestamp" : "asc"}
-        ]
-      }
-    },
-    {
-      "name": "asc_sort_with_after_timestamp",
-      "operation-type": "search",
-      "index": "logs-benchmark-*",
-      "body": {
-        "track_total_hits": false,
-        "query": {
-          "match_all": {}
-        },
-        "sort" : [
-          {"@timestamp" : "asc"}
-        ],
-        "search_after": ["2023-01-01T23:59:58.000Z"]
-      }
-    },
-    {
       "name": "desc_sort_timestamp_can_match_shortcut",
       "operation-type": "search",
       "index": "logs-benchmark-*",
@@ -219,41 +191,6 @@
         },
         "sort" : [
           {"@timestamp" : "desc"}
-        ]
-      }
-    },
-    {
-      "name": "asc_sort_timestamp_can_match_shortcut",
-      "operation-type": "search",
-      "index": "logs-benchmark-*",
-      "body": {
-        "track_total_hits": false,
-        "query": {
-          "match": {
-            "process.name": "kernel"
-          }
-        },
-        "sort" : [
-          {"@timestamp" : "asc"}
-        ]
-      }
-    },
-    {
-      "name": "asc_sort_timestamp_no_can_match_shortcut",
-      "operation-type": "search",
-      "index": "logs-benchmark-*",
-      "request-params" : {
-          "pre_filter_shard_size" : 100000
-      },
-      "body": {
-        "track_total_hits": false,
-        "query": {
-          "match": {
-            "process.name": "kernel"
-          }
-        },
-        "sort" : [
-          {"@timestamp" : "asc"}
         ]
       }
     },
@@ -293,38 +230,6 @@
       }
     },
     {
-      "name": "sort_numeric_desc",
-      "operation-type": "search",
-      "index": "logs-benchmark-*",
-      "body": {
-        "track_total_hits": false,
-        "query": {
-          "match_all": {}
-        },
-        "sort": [
-          {
-            "metrics.size": "desc"
-          }
-        ]
-      }
-    },
-    {
-      "name": "sort_numeric_asc",
-      "operation-type": "search",
-      "index": "logs-benchmark-*",
-      "body": {
-        "track_total_hits": false,
-        "query": {
-          "match_all": {}
-        },
-        "sort": [
-          {
-            "metrics.size": "asc"
-          }
-        ]
-      }
-    },
-    {
       "name": "sort_numeric_desc_with_match",
       "operation-type": "search",
       "index": "logs-benchmark-*",
@@ -358,73 +263,6 @@
             "metrics.size": "asc"
           }
         ]
-      }
-    },
-    {
-      "name": "terms-significant-1",
-      "operation-type": "search",
-      "request-timeout": 7200,
-      "index": "logs-benchmark-*",
-      "body": 
-        {
-          "track_total_hits": false,
-          "size": 0,
-          "query": {
-            "range": {
-              "@timestamp": {
-                "gte": "2023-01-01T00:00:00",
-                "lt": "2023-01-03T00:00:00"
-              }
-            }
-          },
-          "aggs": {
-            "terms": {
-              "terms": {
-                "field": "aws.cloudwatch.log_stream",
-                "size": 10
-              },
-              "aggs": {
-                "significant_ips": {
-                  "significant_terms": {
-                    "field": "process.name"
-                  }
-                }
-              }
-            }
-          }
-        }
-    },
-    {
-      "name": "terms-significant-2",
-      "operation-type": "search",
-      "request-timeout": 7200,
-      "index": "logs-benchmark-*",
-      "body": {
-        "track_total_hits": false,
-        "size": 0,
-        "query": {
-          "range": {
-            "@timestamp": {
-              "gte": "2023-01-01T00:00:00",
-              "lt": "2023-01-03T00:00:00"
-            }
-          }
-        },
-        "aggs": {
-          "terms": {
-            "terms": {
-              "field": "process.name",
-              "size": 10
-            },
-            "aggs": {
-              "significant_ips": {
-                "significant_terms": {
-                  "field": "aws.cloudwatch.log_stream"
-                }
-              }
-            }
-          }
-        }
       }
     },
     {

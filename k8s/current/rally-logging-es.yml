@@ -1,18 +1,18 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: rally-big5-os
+  name: rally-es-logging
 spec:
   completions: 100
   template:
     metadata:
-      name: rally-big5-os
+      name: rally-es-logging
       labels:
-        app: rally-opensearch
+        app: rally-elasticsearch
     spec:
       restartPolicy: Never
       nodeSelector:
-        cloud.google.com/gke-nodepool: os-rally-node-big5
+        cloud.google.com/gke-nodepool: es-rally-node-logging
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -21,7 +21,7 @@ spec:
                   - key: app
                     operator: In
                     values:
-                      - rally-elasticsearch
+                      - rally-opensearch
               topologyKey: kubernetes.io/hostname
       tolerations:
         - key: "kubernetes.io/arch"
@@ -29,33 +29,30 @@ spec:
           effect: "NoSchedule"
       containers:
         - name: rally
-          image: docker.elastic.co/employees/sachinfrayne/rally-custom-big5:2
+          image: docker.elastic.co/employees/sachinfrayne/rally-custom-logging:2
           imagePullPolicy: Always
           env:
             - name: HOSTPORT
-              value: "os-cluster.default.svc.cluster.local:9200"
+              value: "es-cluster-es-http:9200"
             - name: USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: os-cluster-admin-password
-                  key: username
+              value: "elastic"
             - name: PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: os-cluster-admin-password
-                  key: password
+                  name: es-cluster-es-elastic-user
+                  key: elastic
             - name: META
-              value: "product:Opensearch,product-version:Opensearch-3.1.0,benchmark-dataset:openai_vector,benchmark-id:big5-17-aug-2025-9.1.2-vs-3.1.0,benchmark-name:OS-BIG5"
+              value: "product:Elasticsearch,product-version:Elasticsearch-9.1.2,benchmark-dataset:openai_vector,benchmark-id:logging-17-aug-2025-9.1.2-vs-3.1.0,benchmark-name:ES-LOGGING"
           args:
             [
               "race",
-              "--track-path=/rally/custom_tracks/big5",
+              "--track-path=/rally/custom_tracks/logging",
               "--target-hosts=$(HOSTPORT)",
               "--pipeline=benchmark-only",
               "--user-tags=$(META)",
               "--on-error=abort",
               "--client-options=timeout:360,use_ssl:true,verify_certs:false,basic_auth_user:'$(USERNAME)',basic_auth_password:'$(PASSWORD)'",
-              "--challenge=big5",
+              "--challenge=logging",
               "--exclude-tasks=delete-index,index-append,type:index,type:create-index,type:raw-request",
             ]
           volumeMounts:
@@ -64,7 +61,7 @@ spec:
               subPath: "rally.ini"
             - name: rally-base-dir
               mountPath: "/rally/.rally"
-            - name: rally-tracks-data-os
+            - name: rally-tracks-data-es
               mountPath: "/rally-tracks-cache"
       imagePullSecrets:
         - name: regcred
@@ -77,9 +74,9 @@ spec:
                 path: rally.ini
         - name: rally-base-dir
           emptyDir: {}
-        - name: rally-tracks-data-os
+        - name: rally-tracks-data-es
           persistentVolumeClaim:
-            claimName: rally-tracks-data-os
+            claimName: rally-tracks-data-es
       initContainers:
         - name: permission-fix
           image: busybox
@@ -89,4 +86,4 @@ spec:
             - mountPath: /rally/.rally
               name: rally-base-dir
             - mountPath: /rally-tracks-cache
-              name: rally-tracks-data-os
+              name: rally-tracks-data-es

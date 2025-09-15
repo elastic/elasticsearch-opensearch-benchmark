@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # Full path to elastic-integration-corpus-generator-tool binary tool
-export GENERATOR=/Users/sachin/Source/big5-benchmarking/dataset/bin/elastic-integration-corpus-generator-tool-arm
+export GENERATOR=/Users/sachin/Source/elasticsearch-opensearch-benchmarking/dataset/bin/elastic-integration-corpus-generator-tool-arm
 # Where the dataset should be written
-export DATASET=/Users/sachin/Source/big5-benchmarking/dataset
-export CORPORA_ROOT=/Users/sachin/Source/big5-benchmarking/dataset/generated
-export CORPORA=/Users/sachin/Source/big5-benchmarking/dataset/generated/corpora
+export DATASET=/Users/sachin/Source/elasticsearch-opensearch-benchmarking/dataset
+export CORPORA_ROOT=/Users/sachin/Source/elasticsearch-opensearch-benchmarking/dataset/generated
+export CORPORA=/Users/sachin/Source/elasticsearch-opensearch-benchmarking/dataset/generated/corpora
 export CONFIG=config-1.yml
-export BUCKET=gs://big5-benchmarking/2025-08-06/
+export BUCKET=gs://elasticsearch-opensearch-benchmarking/2025-08-06/
 
 mkdir $CORPORA_ROOT
 

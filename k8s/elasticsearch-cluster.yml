@@ -14,7 +14,7 @@ spec:
       podTemplate:
         spec:
           nodeSelector:
-            cloud.google.com/gke-nodepool: elasticsearch-nodepool-big5
+            cloud.google.com/gke-nodepool: elasticsearch-nodepool-logging
           initContainers:
             - name: sysctl
               securityContext:
@@ -50,7 +50,7 @@ spec:
   podTemplate:
     spec:
       nodeSelector:
-        cloud.google.com/gke-nodepool: kibana-nodepool-big5
+        cloud.google.com/gke-nodepool: kibana-nodepool-logging
   count: 1
   elasticsearchRef:
     name: es-cluster

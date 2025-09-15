@@ -4,7 +4,7 @@ metadata:
   name: logstash-es
 spec:
   nodeSelector:
-    cloud.google.com/gke-nodepool: es-rally-node-big5
+    cloud.google.com/gke-nodepool: es-rally-node-logging
   containers:
     - name: logstash
       image: ugosan/logstash-custom:8.8.2-dev
@@ -56,8 +56,8 @@ spec:
       configMap:
         name: logstash-configmap-es
         items:
-          - key: big5-benchmark.conf
-            path: big5-benchmark.conf
+          - key: logging-benchmark.conf
+            path: logging-benchmark.conf
 
 ---
 apiVersion: v1
@@ -66,16 +66,16 @@ metadata:
   name: logstash-configmap-es
 data:
   pipelines.yml: |
-    - pipeline.id: big5-benchmark
-      path.config: "/tmp/logstash/pipelines/big5-benchmark.conf"
+    - pipeline.id: logging-benchmark
+      path.config: "/tmp/logstash/pipelines/logging-benchmark.conf"
       pipeline.batch.size: 4000
   logstash.yml: |
     log.level: info
 
-  big5-benchmark.conf: |
+  logging-benchmark.conf: |
     input {
         google_cloud_storage {
-            bucket_id => "big5-benchmarking"
+            bucket_id => "logging-benchmarking"
             file_matches => "${GCP_FILE_MATCH_REGEX}"
             codec => json_lines
             json_key_file => "/tmp/logstash/credentials/credentials.json"

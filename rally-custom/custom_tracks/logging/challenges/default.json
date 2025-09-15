@@ -1,8 +1,8 @@
 {
-  "name": "big5",
+  "name": "logging",
   "default": true,
   "schedule": [
-    {{ rally.collect(parts="common/big5-schedule.json") }}
+    {{ rally.collect(parts="common/logging-schedule.json") }}
   ]
 },
 {

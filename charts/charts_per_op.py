@@ -8,42 +8,34 @@ if len(sys.argv) < 2:
     sys.exit(1)
 csv_file = sys.argv[1]
 data = pd.read_csv(csv_file)
-# Initial filtering
 try:
     data = data[(data['name'] == 'service_time')]
     data = data[data['value.mean'] != '-']
     data = data[data['user-tags.product'] != '-']
 except:
     pass
-# Fallback for product name
 try:
     data['user-tags.product'] = data['meta.tag_product']
 except Exception:
     pass
-# Convert numeric columns
 for col in ['value.50_0', 'value.90_0', 'value.100_0', 'value.mean']:
     try:
         data[col] = data[col].str.replace(',', '').astype(float)
     except:
         pass
 operations = data['operation'].unique()
-# Output folder
 generated_dir = 'generated'
 if not os.path.exists(generated_dir):
     os.makedirs(generated_dir)
-# Store all stats here
 all_stats = []
 for op in operations:
-    # Filter for the current operation
     op_data = data[data['operation'] == op]
-    # Group by `user-tags.product` and take the mean of numeric columns
     grouped = (
         op_data
         .groupby('user-tags.product')[['value.mean', 'value.50_0', 'value.90_0', 'value.100_0']]
         .mean()
         .reset_index()
     )
-    # Calculate extra metrics: compare ES vs OS
     grouped['product_lower'] = grouped['user-tags.product'].str.lower()
     if {'elasticsearch', 'opensearch'}.issubset(set(grouped['product_lower'])):
         es_mean = grouped.loc[grouped['product_lower'] == 'elasticsearch', 'value.90_0'].values[0]
@@ -56,11 +48,8 @@ for op in operations:
         grouped['percent_faster_es_90_0'] = float('nan')
         grouped['times_faster_es_90_0'] = float('nan')
     grouped = grouped.drop(columns=['product_lower'])
-    # Add operation column for reference in aggregated CSV
     grouped['operation'] = op
-    # Append to list
     all_stats.append(grouped)
-    # Create plots
     fig, (ax1, ax2) = plt.subplots(2)
     builder.performance_diff(
         title=op,
@@ -84,7 +73,6 @@ for op in operations:
     )
     plt.savefig(f"{generated_dir}/{op}.png")
     plt.close(fig)
-# Combine and save one big CSV
 if all_stats:
     final_df = pd.concat(all_stats, ignore_index=True)
     final_df.to_csv(os.path.join(generated_dir, "all_operations_stats.csv"), index=False)

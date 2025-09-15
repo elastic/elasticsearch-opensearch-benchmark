@@ -28,7 +28,7 @@ spec:
     enable: true
     replicas: 1
     nodeSelector:
-      cloud.google.com/gke-nodepool: dashboards-nodepool-big5
+      cloud.google.com/gke-nodepool: dashboards-nodepool-logging
     resources:
       requests:
         memory: "512Mi"
@@ -40,7 +40,7 @@ spec:
     - component: data
       replicas: 6
       nodeSelector:
-        cloud.google.com/gke-nodepool: opensearch-nodepool-big5
+        cloud.google.com/gke-nodepool: opensearch-nodepool-logging
       diskSize: "500Gi"
       jvm: -Xmx28G -Xms28G
       resources:

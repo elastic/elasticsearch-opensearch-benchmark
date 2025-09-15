@@ -11,19 +11,7 @@
   "target-throughput": 2
 },
 {
-  "operation": "asc_sort_timestamp",
-  "warmup-iterations": 200,
-  "iterations": 100,
-  "target-throughput": 2
-},
-{
   "operation": "desc_sort_with_after_timestamp",
-  "warmup-iterations": 200,
-  "iterations": 100,
-  "target-throughput": 2
-},
-{
-  "operation": "asc_sort_with_after_timestamp",
   "warmup-iterations": 200,
   "iterations": 100,
   "target-throughput": 2
@@ -36,18 +24,6 @@
 },
 {
   "operation": "desc_sort_timestamp_no_can_match_shortcut",
-  "warmup-iterations": 200,
-  "iterations": 100,
-  "target-throughput": 2
-},
-{
-  "operation": "asc_sort_timestamp_can_match_shortcut",
-  "warmup-iterations": 200,
-  "iterations": 100,
-  "target-throughput": 2
-},
-{
-  "operation": "asc_sort_timestamp_no_can_match_shortcut",
   "warmup-iterations": 200,
   "iterations": 100,
   "target-throughput": 2
@@ -157,18 +133,6 @@
 },
 {
   "operation": "sort_keyword_no_can_match_shortcut",
-  "warmup-iterations": 200,
-  "iterations": 100,
-  "target-throughput": 2
-},
-{
-  "operation": "sort_numeric_desc",
-  "warmup-iterations": 200,
-  "iterations": 100,
-  "target-throughput": 2
-},
-{
-  "operation": "sort_numeric_asc",
   "warmup-iterations": 200,
   "iterations": 100,
   "target-throughput": 2

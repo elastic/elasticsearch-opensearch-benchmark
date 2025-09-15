@@ -1,5 +1,5 @@
-resource "google_container_cluster" "es_benchmarks_big5" {
-  name                = "es-benchmarks-big5"
+resource "google_container_cluster" "es_benchmarks_logging" {
+  name                = "es-benchmarks-logging"
   location            = "us-central1-a"
   deletion_protection = false
 
@@ -7,9 +7,9 @@ resource "google_container_cluster" "es_benchmarks_big5" {
   initial_node_count       = 1
 }
 
-resource "google_container_node_pool" "elasticsearch_nodes_16cpu_big5" {
-  name       = "elasticsearch-nodepool-big5"
-  cluster    = google_container_cluster.es_benchmarks_big5.id
+resource "google_container_node_pool" "elasticsearch_nodes_16cpu_logging" {
+  name       = "elasticsearch-nodepool-logging"
+  cluster    = google_container_cluster.es_benchmarks_logging.id
   node_count = 6
 
   node_config {
@@ -18,9 +18,9 @@ resource "google_container_node_pool" "elasticsearch_nodes_16cpu_big5" {
   }
 }
 
-resource "google_container_node_pool" "kibana_nodes_2cpu_big5" {
-  name       = "kibana-nodepool-big5"
-  cluster    = google_container_cluster.es_benchmarks_big5.id
+resource "google_container_node_pool" "kibana_nodes_2cpu_logging" {
+  name       = "kibana-nodepool-logging"
+  cluster    = google_container_cluster.es_benchmarks_logging.id
   node_count = 1
 
   node_config {
@@ -29,9 +29,9 @@ resource "google_container_node_pool" "kibana_nodes_2cpu_big5" {
   }
 }
 
-resource "google_container_node_pool" "es_rally_node_big5" {
-  name       = "es-rally-node-big5"
-  cluster    = google_container_cluster.es_benchmarks_big5.id
+resource "google_container_node_pool" "es_rally_node_logging" {
+  name       = "es-rally-node-logging"
+  cluster    = google_container_cluster.es_benchmarks_logging.id
   node_count = 1
 
   node_config {
