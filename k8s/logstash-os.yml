@@ -78,7 +78,7 @@ data:
   logging-benchmark.conf: |
     input {
         google_cloud_storage {
-            bucket_id => "logging-benchmarking"
+            bucket_id => "my-benchmarks-datasets"
             file_matches => "${GCP_FILE_MATCH_REGEX}"
             codec => json_lines
             json_key_file => "/tmp/logstash/credentials/credentials.json"

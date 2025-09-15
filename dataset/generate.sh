@@ -7,7 +7,7 @@ export DATASET=/full/path/to/dataset
 export CORPORA_ROOT=/full/path/to/dataset/generated
 export CORPORA=/full/path/to/dataset/generated/corpora
 export CONFIG=config-1.yml
-export BUCKET=gs://elasticsearch-opensearch-benchmarking/2025-08-06/
+export BUCKET=gs://my-benchmarks-datasets/2025-08-06/
 
 mkdir $CORPORA_ROOT
 
